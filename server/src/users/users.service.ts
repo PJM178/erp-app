@@ -1,0 +1,60 @@
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./entities/user.entity";
+import { CreateUserDto } from "./dto/create-user.dto";
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
+  async findOne(id: number): Promise<User | null> {
+    const user = await this.usersRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    return user;
+  }
+
+  async remove(id: number): Promise<void> {
+    const deletedUser = await this.usersRepository.delete(id);
+
+    console.log(deletedUser);
+  }
+
+  async create(dto: CreateUserDto): Promise<Partial<CreateUserDto>> {
+    const user = this.usersRepository.create(dto);
+
+    try {
+      const result = await this.usersRepository.save(user);
+
+      return result;
+    } catch (err) {
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "code" in err &&
+        (err as { code?: string }).code === "23505"
+      ) {
+        throw new ConflictException(
+          `User with username '${dto.username}' already exists`,
+        );
+      }
+
+      throw err;
+    }
+  }
+}

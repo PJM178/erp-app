@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: erp-app-postgresql
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: devdb
+    ports:
+      - '5000:5432'
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
