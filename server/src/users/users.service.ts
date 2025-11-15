@@ -29,10 +29,10 @@ export class UsersService {
     return user;
   }
 
-  async remove(id: number): Promise<void> {
-    const deletedUser = await this.usersRepository.delete(id);
+  async remove(id: number): Promise<boolean> {
+    const result = await this.usersRepository.delete(id);
 
-    console.log(deletedUser);
+    return (result.affected || 0) > 0;
   }
 
   async create(dto: CreateUserDto): Promise<Partial<CreateUserDto>> {
