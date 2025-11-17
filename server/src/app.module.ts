@@ -1,10 +1,12 @@
-import { Module } from "@nestjs/common";
+import { Module, OnApplicationBootstrap } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 // import { User } from "./users/entities/user.entity";
 import { UsersModule } from "./users/users.module";
+import { AuthModule } from "./auth/auth.module";
+import { UsersService } from "./users/users.service";
 
 @Module({
   imports: [
@@ -20,8 +22,24 @@ import { UsersModule } from "./users/users.module";
       autoLoadEntities: true,
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements OnApplicationBootstrap {
+  constructor(private readonly usersService: UsersService) {}
+
+  async onApplicationBootstrap() {
+    const admin = await this.usersService.findOneByUsername("admin");
+
+    if (!admin) {
+      console.log("Seeding users...");
+      const admin = await this.usersService.create({
+        username: "admin",
+        password: "admin",
+      });
+      console.log("User created: ", admin);
+    }
+  }
+}
