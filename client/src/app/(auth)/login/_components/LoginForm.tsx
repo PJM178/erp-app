@@ -5,6 +5,7 @@ import styles from "./LoginForm.module.css";
 import { Button } from "@/components/Buttons";
 import { useState } from "react";
 import { LoginUser, loginUserSchema } from "@/schemas/user.schema";
+import { ErrorMessage } from "@/components/UiNotifications";
 
 // TODO: use server actions where necessary - usually mutations can be server actions while GET 
 // method actions should be client functions using React Query, for example, for easier caching
@@ -17,7 +18,7 @@ const LoginForm = () => {
     username: "",
     password: "",
   });
-  const [errors, setErrors] = useState<Partial<LoginUser>>({
+  const [errors, setErrors] = useState<Partial<LoginUser> | null>({
     username: undefined,
     password: undefined,
   });
@@ -33,9 +34,11 @@ const LoginForm = () => {
       const formattedErrors = validationResult.error.format();
       console.log(formattedErrors);
       const thing = Object.fromEntries(Object.entries(formattedErrors).filter(([k]) => k !== "_errors").map(([k, v]) => [k, (v as { _errors: string[] })?._errors[0]]));
-      
+
       console.log(thing);
       setErrors(thing);
+    } else {
+      setErrors(null);
     }
   };
   console.log(errors);
@@ -43,6 +46,12 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit}>
       <div className={styles["form-inputs--container"]}>
         <div className={styles["input--container"]}>
+          <ErrorMessage
+            color="error"
+            enabled={!!errors?.username}
+          >
+            {errors?.username}
+          </ErrorMessage>
           <label htmlFor="username">Username</label>
           <InputField
             value={form.username}
@@ -53,6 +62,12 @@ const LoginForm = () => {
           />
         </div>
         <div className={styles["input--container"]}>
+          <ErrorMessage
+            color="error"
+            enabled={!!errors?.password}
+          >
+            {errors?.password}
+          </ErrorMessage>
           <label htmlFor="password">Password</label>
           <InputField
             value={form.password}

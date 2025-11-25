@@ -1,0 +1,9 @@
+.error-message--container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message--color-error {
+  color: red;
+}
