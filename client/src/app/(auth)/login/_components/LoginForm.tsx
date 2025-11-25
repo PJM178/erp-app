@@ -3,7 +3,7 @@
 import { InputField } from "@/components/Inputs";
 import styles from "./LoginForm.module.css";
 import { Button } from "@/components/Buttons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginUser, loginUserSchema } from "@/schemas/user.schema";
 import { ErrorMessage } from "@/components/UiNotifications";
 
@@ -18,10 +18,7 @@ const LoginForm = () => {
     username: "",
     password: "",
   });
-  const [errors, setErrors] = useState<Partial<LoginUser> | null>({
-    username: undefined,
-    password: undefined,
-  });
+  const [errors, setErrors] = useState<Partial<LoginUser> | null>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +30,11 @@ const LoginForm = () => {
       console.log(validationResult.error.format());
       const formattedErrors = validationResult.error.format();
       console.log(formattedErrors);
-      const thing = Object.fromEntries(Object.entries(formattedErrors).filter(([k]) => k !== "_errors").map(([k, v]) => [k, (v as { _errors: string[] })?._errors[0]]));
+      const thing = Object.fromEntries(
+        Object.entries(formattedErrors)
+          .filter(([k]) => k !== "_errors")
+          .map(([k, v]) => [k, (v as { _errors: string[] })?._errors[0]])
+      );
 
       console.log(thing);
       setErrors(thing);
@@ -41,6 +42,13 @@ const LoginForm = () => {
       setErrors(null);
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm(prev => {
+      return { ...prev, [e.target.name]: e.target.value }
+    });
+  };
+
   console.log(errors);
   return (
     <form onSubmit={handleSubmit}>
@@ -55,7 +63,7 @@ const LoginForm = () => {
           <label htmlFor="username">Username</label>
           <InputField
             value={form.username}
-            onChange={(e) => setForm(prev => ({ ...prev, username: e.target.value }))}
+            onChange={handleInputChange}
             inputType="outlined"
             name="username"
             id="username"
@@ -71,7 +79,7 @@ const LoginForm = () => {
           <label htmlFor="password">Password</label>
           <InputField
             value={form.password}
-            onChange={(e) => setForm(prev => ({ ...prev, password: e.target.value }))}
+            onChange={handleInputChange}
             inputType="outlined"
             name="password"
             id="password"
