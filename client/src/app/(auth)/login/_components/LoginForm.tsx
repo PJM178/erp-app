@@ -24,32 +24,42 @@ const LoginForm = () => {
     e.preventDefault();
 
     const validationResult = loginUserSchema.safeParse(form);
-    console.log(validationResult.error);
-    console.log(validationResult.data);
+
     if (!validationResult.success) {
-      console.log(validationResult.error.format());
       const formattedErrors = validationResult.error.format();
-      console.log(formattedErrors);
-      const thing = Object.fromEntries(
+      const cleanedErrorObject = Object.fromEntries(
         Object.entries(formattedErrors)
           .filter(([k]) => k !== "_errors")
           .map(([k, v]) => [k, (v as { _errors: string[] })?._errors[0]])
       );
 
-      console.log(thing);
-      setErrors(thing);
+      setErrors(cleanedErrorObject);
     } else {
       setErrors(null);
+      console.log("submit success here");
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => {
-      return { ...prev, [e.target.name]: e.target.value }
+      if (errors) {
+        const key = e.target.name as keyof LoginUser;
+        const fieldSchema = loginUserSchema.shape[key];
+        const propertyValidationResult = fieldSchema.safeParse(e.target.value);
+
+        if (propertyValidationResult.success) {
+          setErrors(prev => ({ ...prev, [e.target.name]: undefined }));
+        } else {
+          const formattedPropertyError = propertyValidationResult.error.format();
+
+          setErrors(prev => ({ ...prev, [e.target.name]: formattedPropertyError._errors[0]}));
+        }
+      }
+
+      return { ...prev, [e.target.name]: e.target.value };
     });
   };
 
-  console.log(errors);
   return (
     <form onSubmit={handleSubmit}>
       <div className={styles["form-inputs--container"]}>
