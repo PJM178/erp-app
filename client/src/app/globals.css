@@ -3,6 +3,14 @@
   --foreground: #171717;
 }
 
+/* Breakpoints for media queries */
+:root {
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -49,6 +57,7 @@ a {
   width: 24px;
 }
 
+
 /* Google fonts & Icons - START */
 
 .material-symbols-outlined {
@@ -66,3 +75,16 @@ a {
 }
 
 /* Google fonts & Icons - END */
+
+
+/* Main app layout media queries - START */
+
+@media (min-width: 1024px) {
+  body {
+    padding: 3rem;
+    max-width: 1200px;
+    margin: 0 auto; /* center content */
+  }
+}
+
+/* Main app layout media queries - END */

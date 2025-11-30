@@ -20,7 +20,7 @@ const LoginForm = () => {
   });
   const [errors, setErrors] = useState<Partial<LoginUser> | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const validationResult = loginUserSchema.safeParse(form);
@@ -35,6 +35,17 @@ const LoginForm = () => {
 
       setErrors(cleanedErrorObject);
     } else {
+      const res = await fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(form),
+      });
+      
+     const data = await res.json();
+      console.log(data);
       setErrors(null);
       console.log("submit success here");
     }
@@ -61,7 +72,10 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form 
+    className={styles["form--container"]}
+    onSubmit={handleSubmit}
+    >
       <div className={styles["form-inputs--container"]}>
         <div className={styles["input--container"]}>
           <ErrorMessage

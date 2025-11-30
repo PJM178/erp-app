@@ -1,0 +1,5 @@
+.page {
+  border-radius: 8px;
+  border: solid 1px rgba(211, 211, 211, 0.8);
+  padding: 1rem;
+}
