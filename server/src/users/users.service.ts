@@ -3,12 +3,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { HashService } from "src/common/hash/hash.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private hashService: HashService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -34,9 +36,12 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto): Promise<Partial<CreateUserDto>> {
-    const user = this.usersRepository.create(dto);
-
     try {
+      const hashedPassword = await this.hashService.hashValue(dto.password);
+      const user = this.usersRepository.create({
+        ...dto,
+        password: hashedPassword,
+      });
       const result = await this.usersRepository.save(user);
 
       return result;
