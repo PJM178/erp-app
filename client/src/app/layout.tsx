@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
+import { fetchCurrentUser } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,11 +24,14 @@ export const metadata: Metadata = {
 const iconList = ["error"];
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await fetchCurrentUser();
+
+  console.log('Logged in user:', user);
   return (
     <html lang="en">
       <head>
@@ -38,6 +41,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {user.token}
         {children}
       </body>
     </html>

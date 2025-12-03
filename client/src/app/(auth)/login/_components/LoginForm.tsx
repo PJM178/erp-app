@@ -71,6 +71,20 @@ const LoginForm = () => {
     });
   };
 
+  // TODO: testing sending refresh token to path here on loading the component
+  useEffect(() => {
+    const fetchPath = async () => {
+      const res = await fetch("http://localhost:8000/api/auth/refresh", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      console.log(await res.json());
+    };
+
+    fetchPath();
+  }, []);
+
   return (
     <form 
     className={styles["form--container"]}

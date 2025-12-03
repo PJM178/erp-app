@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { HashService } from "src/common/hash/hash.service";
+import { User } from "src/users/entities/user.entity";
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
   async signIn(
     username: string,
     userPassword: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; user?: Partial<User> }> {
     const user = await this.usersService.findOneByUsername(username);
 
     if (!user) {
@@ -30,11 +31,14 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = { sub: user.uuid, username: user.username };
+    const payload = { sub: user.uuid };
     const token = await this.jwtService.signAsync(payload);
 
     return {
       access_token: token,
+      user: {
+        username: user.username,
+      },
     };
   }
 }
