@@ -41,7 +41,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {user.token}
+        {user?.token}
         {children}
       </body>
     </html>

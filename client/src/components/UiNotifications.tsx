@@ -13,8 +13,8 @@ export const ErrorMessage = (props: ErrorMessageProps) => {
   
   const messageColor = {
     error: "error-message--color-error",
-    warning: "error-message--color-error",
-    success: "error-message--color-error",
+    warning: "error-message--color-warning",
+    success: "error-message--color-success",
   };
 
   return (

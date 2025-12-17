@@ -7,3 +7,11 @@
 .error-message--color-error {
   color: red;
 }
+
+.error-message--color-warning {
+  color: orange;
+}
+
+.error-message--color-success {
+  color: green;
+}

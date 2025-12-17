@@ -43,8 +43,8 @@ const LoginForm = () => {
         credentials: "include",
         body: JSON.stringify(form),
       });
-      
-     const data = await res.json();
+
+      const data = await res.json();
       console.log(data);
       setErrors(null);
       console.log("submit success here");
@@ -63,7 +63,7 @@ const LoginForm = () => {
         } else {
           const formattedPropertyError = propertyValidationResult.error.format();
 
-          setErrors(prev => ({ ...prev, [e.target.name]: formattedPropertyError._errors[0]}));
+          setErrors(prev => ({ ...prev, [e.target.name]: formattedPropertyError._errors[0] }));
         }
       }
 
@@ -74,21 +74,26 @@ const LoginForm = () => {
   // TODO: testing sending refresh token to path here on loading the component
   useEffect(() => {
     const fetchPath = async () => {
-      const res = await fetch("http://localhost:8000/api/auth/refresh", {
-        method: "GET",
-        credentials: "include",
-      });
+      try {
+        const res = await fetch("http://localhost:8000/api/auth/refresh", {
+          method: "GET",
+          credentials: "include",
+        });
 
-      console.log(await res.json());
+        console.log(await res.json());
+      } catch (err) {
+        console.warn(err);
+      }
+
     };
 
     fetchPath();
   }, []);
 
   return (
-    <form 
-    className={styles["form--container"]}
-    onSubmit={handleSubmit}
+    <form
+      className={styles["form--container"]}
+      onSubmit={handleSubmit}
     >
       <div className={styles["form-inputs--container"]}>
         <div className={styles["input--container"]}>
