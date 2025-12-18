@@ -42,7 +42,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <AuthProvider token={user.token}>
+        <AuthProvider token={user?.token}>
           {user?.token}
           {children}
         </AuthProvider>

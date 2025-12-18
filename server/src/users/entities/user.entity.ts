@@ -9,10 +9,10 @@ export class User {
   @Column({ type: "uuid", unique: true, default: () => "uuid_generate_v4()" })
   uuid: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: "first_name" })
   firstName: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: "last_name" })
   lastName: string;
 
   @Column({ unique: true })
@@ -21,7 +21,10 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: true })
+  @Column({ length: 255, nullable: true })
+  email: string;
+
+  @Column({ default: true, name: "is_active" })
   isActive: boolean;
 
   @OneToMany(() => RefreshToken, (token) => token.user)

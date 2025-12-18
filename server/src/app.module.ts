@@ -6,8 +6,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 // import { User } from "./users/entities/user.entity";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
-import { UsersService } from "./users/users.service";
 import { HashModule } from "./common/hash/hash.module";
+import { DataSource } from "typeorm";
+import { HashService } from "./common/hash/hash.service";
 
 @Module({
   imports: [
@@ -37,19 +38,54 @@ import { HashModule } from "./common/hash/hash.module";
   providers: [AppService],
 })
 export class AppModule implements OnApplicationBootstrap {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly hashService: HashService,
+  ) {}
 
   async onApplicationBootstrap() {
-    const admin = await this.usersService.findOneByUsername("admin");
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (!admin) {
-      console.log("Seeding users...");
-      const admin = await this.usersService.create({
-        username: "admin",
-        password: "admin",
-      });
-      console.log("User created: ", admin);
-      console.log("Users seeded");
+    try {
+      const usernames = ["admin", "bob"];
+
+      const placeholders = usernames.map((_, i) => `$${i + 1}`).join(", ");
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const users = await queryRunner.query(
+        `SELECT * FROM users WHERE username IN (${placeholders})`,
+        usernames,
+      );
+
+      if (users.length === 0) {
+        console.log("Seeding users...");
+
+        await queryRunner.query(
+          `
+            INSERT INTO users (username, password, "first_name", "last_name", email)
+            VALUES 
+              ($1, $2, $3, $4, $5),
+              ($6, $7, $8, $9, $10)
+          `,
+          [
+            // eslint-disable-next-line prettier/prettier
+            "admin", await this.hashService.hashValue("admin"), "Jorma", "Korva", "admin@admin.com",
+            // eslint-disable-next-line prettier/prettier
+            "bob", await this.hashService.hashValue("bob"), "Korva", "Jorma", "bob@bob.com",
+          ],
+        );
+
+        console.log("Users seeded");
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      console.error(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 }
