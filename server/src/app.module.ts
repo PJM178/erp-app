@@ -21,7 +21,7 @@ import { HashModule } from "./common/hash/hash.module";
       useFactory: (config: ConfigService) => ({
         type: "postgres",
         host: config.get("PGHOST"),
-        port: config.get("PGPORT") || 5000,
+        port: config.get("PGPORT") || 7000,
         username: config.get("PGUSER"),
         password: config.get("PGPASSWORD"),
         database: config.get("PGDATABASE"),

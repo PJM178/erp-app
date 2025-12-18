@@ -11,7 +11,7 @@ const AuthContext = createContext<AuthContext | null>(null);
 
 export function AuthProvider({ children, token }: { children: React.ReactNode, token: string }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  // Token retrieval should happen when hydration has already happened since otherwise it can be read
+  // TODO: Token retrieval should happen when hydration has already happened since otherwise it can be read
   // in the js bundle and in html source
   // User name and such is acceptable to be populated during SSR
   // Access token should be retrieved in an useEffect hook call
