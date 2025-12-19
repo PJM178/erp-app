@@ -2,9 +2,12 @@ import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
 import { DataSource } from "typeorm";
 import { HashService } from "src/common/hash/hash.service";
 import { isProduction } from "src/common/env/bootstrap-env";
+import { User } from "src/users/entities/user.entity";
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
+  private static readonly USERS_TO_INSERT = 50;
+
   constructor(
     private readonly dataSource: DataSource,
     private readonly hashService: HashService,
@@ -18,33 +21,51 @@ export class SeedService implements OnApplicationBootstrap {
     await queryRunner.startTransaction();
 
     try {
-      const usernames = ["admin", "bob"];
-
-      const placeholders = usernames.map((_, i) => `$${i + 1}`).join(", ");
-
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const users = await queryRunner.query(
-        `SELECT * FROM users WHERE username IN (${placeholders})`,
-        usernames,
+      const userCount = await queryRunner.query(
+        `
+          SELECT COUNT(*) FROM users;
+        `,
       );
 
-      if (users.length === 0) {
+      if (!+userCount[0].count) {
         console.log("Seeding users...");
 
-        await queryRunner.query(
-          `
-            INSERT INTO users (username, password, "first_name", "last_name", email)
-            VALUES 
-              ($1, $2, $3, $4, $5),
-              ($6, $7, $8, $9, $10)
-          `,
-          [
-            // eslint-disable-next-line prettier/prettier
-            "admin", await this.hashService.hashValue("admin"), "Jorma", "Korva", "admin@email.com",
-            // eslint-disable-next-line prettier/prettier
-            "bob", await this.hashService.hashValue("bob"), "Korva", "Jorma", "bob@email.com",
-          ],
+        const usersToInsert = [
+          {
+            username: "admin",
+            password: await this.hashService.hashValue("admin"),
+            firstName: "admin",
+            lastName: "admin",
+            email: "admin@email.com",
+          },
+        ];
+
+        for (let i = 0; i < SeedService.USERS_TO_INSERT; i++) {
+          const user = {
+            username: "user" + i,
+            password: "user" + i,
+            firstName: "user" + i,
+            lastName: "user" + i,
+            email: `${"user" + i}@email.com`,
+          };
+
+          usersToInsert.push(user);
+        }
+
+        await Promise.all(
+          usersToInsert.map(async (user) => {
+            user.password = await this.hashService.hashValue(user.password);
+          }),
         );
+
+        await queryRunner.manager
+          .createQueryBuilder()
+          .insert()
+          .into(User)
+          .values(usersToInsert)
+          .orIgnore()
+          .execute();
 
         console.log("Users seeded");
       }
