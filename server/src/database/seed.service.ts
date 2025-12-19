@@ -34,7 +34,7 @@ export class SeedService implements OnApplicationBootstrap {
         const usersToInsert = [
           {
             username: "admin",
-            password: await this.hashService.hashValue("admin"),
+            password: "admin",
             firstName: "admin",
             lastName: "admin",
             email: "admin@email.com",
