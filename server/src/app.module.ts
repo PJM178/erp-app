@@ -10,6 +10,7 @@ import { HashModule } from "./common/hash/hash.module";
 import { SeedModule } from "./database/seed.module";
 import { isProduction } from "./common/env/bootstrap-env";
 import { isProductionFromConfig } from "./common/env/config-env";
+import { BillingModule } from "./finance/billing/billing.module";
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { isProductionFromConfig } from "./common/env/config-env";
     UsersModule,
     AuthModule,
     HashModule,
+    BillingModule,
     ...(!isProduction() ? [SeedModule] : []),
   ],
   controllers: [AppController],
