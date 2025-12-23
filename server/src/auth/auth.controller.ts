@@ -47,6 +47,7 @@ export class AuthController {
       httpOnly: true,
       secure: !isProduction() ? false : true,
       sameSite: "lax",
+      // 7 days
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

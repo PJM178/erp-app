@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./Header.module.css";
 import UserInfo from "./UserInfo";
 
@@ -10,6 +11,15 @@ const Header = (props: HeaderProps) => {
     <header className={styles["container"]}>
       <div>This is header, and this is &quot;something&quot; prop: {props.something || "oops, not defined"}</div>
       <UserInfo />
+      <nav className={styles["nav"]}>
+        <Link href={"/"}>
+          <div>Home</div>
+        </Link>
+        <Link href={"/payments"}>
+          <div>Payments</div>
+        </Link>
+      </nav>
+
     </header>
   );
 };

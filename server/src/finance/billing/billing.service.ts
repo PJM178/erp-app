@@ -9,15 +9,22 @@ import { Repository } from "typeorm";
 export class BillingService {
   constructor(
     @InjectRepository(Billing)
-    private billingsReposity: Repository<Billing>,
+    private billingsRepository: Repository<Billing>,
   ) {}
 
-  create(createBillingDto: CreateBillingDto) {
-    return "This action adds a new billing";
+  async create(createBillingDto: CreateBillingDto) {
+    const billingEntity = this.billingsRepository.create(createBillingDto);
+    const savedBillingEntity = await this.billingsRepository.save(billingEntity);
+    console.log(savedBillingEntity);
+    return savedBillingEntity;
   }
 
-  findAll() {
-    return `This action returns all billing`;
+  async findAll() {
+    const allBillings = await this.billingsRepository.find();
+    const test = await this.create({ customerId: "1", amount: 42069 });
+    console.log(allBillings);
+    console.log("created new billing", test);
+    return allBillings;
   }
 
   findOne(id: number) {

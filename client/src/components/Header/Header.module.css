@@ -2,3 +2,9 @@
   padding: 1.5rem;
   background-color: darkslategray;
 }
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
